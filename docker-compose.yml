@@ -2,11 +2,11 @@ version: '3.3'
 
 services:
   graylog-mongo:
-    image: "mongo:4"
+    image: mongo:4.2
     restart: always
     volumes:
-      - ./graylog/mongodb:/data/db
-      - ./mongod.conf:/etc/mongo/mongod.conf
+      - ./graylog/mongodb:/data/db:rw
+      - ./mongod.conf:/etc/mongo/mongod.conf:ro
     ports:
       - 27017:27017
     command: "mongod --config /etc/mongo/mongod.conf"
@@ -24,9 +24,7 @@ services:
       - 9200:9200
     environment:
       - TZ=Africa/Porto-Novo
-      - http.host=0.0.0.0
-      - transport.host=localhost
-      - network.host=0.0.0.0
+      - transport.host=192.168.86.105
       - node.max_local_storage_nodes=4
       - ES_JAVA_OPTS=-Xms512m -Xmx512m
       - elasticsearch_max_time_per_index=1d
@@ -40,21 +38,21 @@ services:
         hard: -1
 
   graylog:
-    image: graylog/graylog:3.1
+    image: graylog/graylog:4.0
     restart: always
     volumes:
-      - ./graylog/journal:/usr/share/graylog/data/journal
-      - ./graylog/config:/usr/share/graylog/data/config
+      - ./graylog/journal:/usr/share/graylog/data/journal:rw
+      - ./graylog/config:/usr/share/graylog/data/config:rw
     environment:
       - TZ=Africa/Porto-Novo
       - GRAYLOG_PASSWORD_SECRET=graylogpasswordsecret
       - GRAYLOG_ROOT_PASSWORD_SHA2=5D5E792708BFA15F0AB42E817B4E69379777D2722E0529DFB031C0B847DB137D
-      - GRAYLOG_WEB_ENDPOINT_URI=http://192.168.86.13:9000/api/
+      - GRAYLOG_WEB_ENDPOINT_URI=http://192.168.86.31:9000/api/
       - GRAYLOG_HTTP_BIND_ADDRESS=0.0.0.0:9000
-      - GRAYLOG_HTTP_EXTERNAL_URI=http://192.168.86.13:9000/
-      - GRAYLOG_TRANSPORT_EMAIL_WEB_INTERFACE_URL=http://192.168.86.13:9000
-      - GRAYLOG_ELASTICSEARCH_HOSTS=http://192.168.86.13:9200
-      - GRAYLOG_MONGODB_URI=mongodb://graylog:KgDH0WD5x8UnIfFdU1fO@192.168.86.13:27017/graylog
+      - GRAYLOG_HTTP_EXTERNAL_URI=http://192.168.86.31:9000/
+      - GRAYLOG_TRANSPORT_EMAIL_WEB_INTERFACE_URL=http://192.168.86.31:9000
+      - GRAYLOG_ELASTICSEARCH_HOSTS=http://192.168.86.31:9200
+      - GRAYLOG_MONGODB_URI=mongodb://graylog:KgDH0WD5x8UnIfFdU1fO@192.168.86.31:27017
     depends_on:
       - graylog-mongo
       - graylog-elasticsearch
