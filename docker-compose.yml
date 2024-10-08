@@ -32,6 +32,8 @@ services:
       - indices.fielddata.cache.size=20%
       - elasticsearch_shards=1
       - elasticsearch_replicas=1
+      - ELASTIC_USERNAME=elastic
+      - ELASTIC_PASSWORD=elasticpwd
     ulimits:
       memlock:
         soft: -1
@@ -51,8 +53,8 @@ services:
       - GRAYLOG_HTTP_BIND_ADDRESS=0.0.0.0:9000
       - GRAYLOG_HTTP_EXTERNAL_URI=http://0.0.0.0:9000/
 #      - GRAYLOG_TRANSPORT_EMAIL_WEB_INTERFACE_URL=http://192.168.86.31:9000
-      - GRAYLOG_ELASTICSEARCH_HOSTS=http://graylog-elasticsearch:9200
-      - GRAYLOG_MONGODB_URI=mongodb://graylog:KgDH0WD5x8UnIfFdU1fO@graylog-mongo:27017
+      - GRAYLOG_ELASTICSEARCH_HOSTS=http://elastic:elasticpwd@graylog-elasticsearch:9200
+      - GRAYLOG_MONGODB_URI=mongodb://graylog:KgDH0WD5x8UnIfFdU1fO@graylog-mongo:27017/graylog
     depends_on:
       - graylog-mongo
       - graylog-elasticsearch
