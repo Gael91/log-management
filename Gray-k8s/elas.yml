@@ -1,0 +1,102 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: monitoring
+  name: elas-config
+  labels:
+    app: elas
+data:
+  elasticsearch.yml: |-
+    discovery.type: single-node
+    cluster.name: elasticsearch
+    network.host: 0.0.0.0
+    network.publish_host: 192.168.86.105
+    http.port: 9200
+    transport.port: 9300
+    xpack.security.enabled: true
+    xpack.monitoring.collection.enabled: true
+    bootstrap.memory_lock: true
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: monitoring
+  name: elas
+  labels:
+    app: elas
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: elas
+  template:
+    metadata:
+      labels:
+        app: elas
+    spec:
+      containers:
+      - name: elas
+        image: docker.elastic.co/elasticsearch/elasticsearch:7.10.1
+        env:
+        - name: CLUSTER_NAME
+          value: elasticsearch
+        - name: NODE_NAME
+          value: elasticsearch-master
+        - name: "ES_JAVA_OPTS"
+          value: "-Xms512m -Xmx512m"
+        - name: "ELASTIC_USERNAME"
+          value: "elastic"
+        - name: "ELASTIC_PASSWORD"
+          value: "elasticpwd"
+        ports:
+        - containerPort: 9200
+          name: http
+        - containerPort: 9300
+          name: transport
+        resources:
+          limits:
+            cpu: 250m
+            memory: 1Gi
+          requests:
+            cpu: 150m
+            memory: 512Mi
+        securityContext:
+          privileged: true
+          runAsUser: 1000
+        volumeMounts:
+        - name: config
+          mountPath: /usr/share/elasticsearch/config/elasticsearch.yml
+          readOnly: true
+          subPath: elasticsearch.yml
+        - name: storage
+          mountPath: /data
+      volumes:
+      - name: config
+        configMap:
+          name: elas-config
+      - name: "storage"
+        emptyDir:
+          medium: ""
+      initContainers:
+      - name: increase-vm-max-map
+        image: busybox
+        command: ["sysctl", "-w", "vm.max_map_count=262144"]
+        securityContext:
+          privileged: true
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: monitoring
+  name: elas
+  labels:
+    app: elas
+spec:
+  ports:
+  - port: 9200
+    name: http
+  - port: 9300
+    name: transport
+  selector:
+    app: elas

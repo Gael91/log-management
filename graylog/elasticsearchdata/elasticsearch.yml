@@ -1,0 +1,14 @@
+---
+## Default Elasticsearch configuration from elasticsearch-docker.
+## from https://github.com/elastic/elasticsearch-docker/blob/master/.tedi/template/elasticsearch.yml
+#
+
+discovery.type: single-node
+cluster.name: elasticsearch
+network.host: 0.0.0.0
+network.publish_host: 192.168.86.105
+http.port: 9200
+transport.port: 9300
+xpack.security.enabled: true
+xpack.monitoring.collection.enabled: true
+bootstrap.memory_lock: true
