@@ -22,16 +22,10 @@ services:
       - ./graylog/elasticsearchdata/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
     ports:
       - 9200:9200
+      - 9300:9300
     environment:
       - TZ=Africa/Porto-Novo
-      - transport.host=0.0.0.0
-      - node.max_local_storage_nodes=4
       - ES_JAVA_OPTS=-Xms512m -Xmx512m
-      - elasticsearch_max_time_per_index=1d
-      - elasticsearch_max_number_of_indices=8
-      - indices.fielddata.cache.size=20%
-      - elasticsearch_shards=1
-      - elasticsearch_replicas=1
       - ELASTIC_USERNAME=elastic
       - ELASTIC_PASSWORD=elasticpwd
     ulimits:
@@ -45,16 +39,6 @@ services:
     volumes:
       - ./graylog/journal:/usr/share/graylog/data/journal:rw
       - ./graylog/config:/usr/share/graylog/data/config:rw
-    environment:
-      - TZ=Africa/Porto-Novo
-      - GRAYLOG_PASSWORD_SECRET=graylogpasswordsecret
-      - GRAYLOG_ROOT_PASSWORD_SHA2=5D5E792708BFA15F0AB42E817B4E69379777D2722E0529DFB031C0B847DB137D
-      - GRAYLOG_WEB_ENDPOINT_URI=http://localhost:9000/api/
-      - GRAYLOG_HTTP_BIND_ADDRESS=0.0.0.0:9000
-      - GRAYLOG_HTTP_EXTERNAL_URI=http://0.0.0.0:9000/
-#      - GRAYLOG_TRANSPORT_EMAIL_WEB_INTERFACE_URL=http://192.168.86.31:9000
-      - GRAYLOG_ELASTICSEARCH_HOSTS=http://elastic:elasticpwd@graylog-elasticsearch:9200
-      - GRAYLOG_MONGODB_URI=mongodb://graylog:KgDH0WD5x8UnIfFdU1fO@graylog-mongo:27017/graylog
     depends_on:
       - graylog-mongo
       - graylog-elasticsearch
