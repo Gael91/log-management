@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: fluent-bit-config
-  namespace: logging
+  namespace: monitoring
   labels:
     k8s-app: fluent-bit
 data:
@@ -10,13 +10,13 @@ data:
   # ======================================================
   fluent-bit.conf: |
     [SERVICE]
-        Flush                     1
-        Log_Level                 info
-        Daemon                    off
-        Parsers_File              parsers.conf
-        HTTP_Server               On
-        HTTP_Listen               0.0.0.0
-        HTTP_Port                 2020
+        Flush         1
+        Log_Level     info
+        Daemon        off
+        Parsers_File  parsers.conf
+        HTTP_Server   On
+        HTTP_Listen   0.0.0.0
+        HTTP_Port     2020
 
     @INCLUDE input-kubernetes.conf
     @INCLUDE filter-kubernetes.conf
@@ -24,19 +24,14 @@ data:
 
   input-kubernetes.conf: |
     [INPUT]
-        Name               tail
-        Tag                kube.*
-        Path               /var/log/containers/*.log
-        Parser             docker
-        DB                 /var/log/flb_graylog.db
-        DB.Sync            Normal
-        Docker_Mode        On
-        Buffer_Chunk_Size  512KB
-        Buffer_Max_Size    5M
-        Rotate_Wait        30
-        Mem_Buf_Limit      30MB
-        Skip_Long_Lines    On
-        Refresh_Interval   10
+        Name              tail
+        Tag               kube.*
+        Path              /var/log/containers/*.log
+        Parser            docker
+        DB                /var/log/flb_kube.db
+        Mem_Buf_Limit     5MB
+        Skip_Long_Lines   On
+        Refresh_Interval  10
 
   filter-kubernetes.conf: |
     [FILTER]
@@ -46,46 +41,22 @@ data:
         Merge_Log_Key       log
         Keep_Log            Off
         K8S-Logging.Parser  On
-        K8S-Logging.Exclude Off   
+        K8S-Logging.Exclude Off		
         Annotations         Off
-        Labels              On  
+        Labels              On
+        Host_Key            host  # Ajoute cette ligne	
 
   output-graylog.conf: |
     [OUTPUT]
-        Name                    gelf
-        Match                   *
-        Host                    192.168.86.13
-        Port                    12201
-        Mode                    tcp
-        Gelf_Short_Message_Key  log 
+        Name          gelf
+        Match         kube.*
+        Host          graylog
+        Port          12201
+        Mode          tcp
+        Gelf_Short_Message_Key log
+        Gelf_Host_Key Host  # Ajoute cette ligne
 
   parsers.conf: |
-    [PARSER]
-        Name   apache
-        Format regex
-        Regex  ^(?<host>[^ ]*) [^ ]* (?<user>[^ ]*) \[(?<time>[^\]]*)\] "(?<method>\S+)(?: +(?<path>[^\"]*?)(?: +\S*)?)?" (?<code>[^ ]*) (?<size>[^ ]*)(?: "(?<referer>[^\"]*)" "(?<agent>[^\"]*)")?$
-        Time_Key time
-        Time_Format %d/%b/%Y:%H:%M:%S %z
-
-    [PARSER]
-        Name   apache2
-        Format regex
-        Regex  ^(?<host>[^ ]*) [^ ]* (?<user>[^ ]*) \[(?<time>[^\]]*)\] "(?<method>\S+)(?: +(?<path>[^ ]*) +\S*)?" (?<code>[^ ]*) (?<size>[^ ]*)(?: "(?<referer>[^\"]*)" "(?<agent>[^\"]*)")?$
-        Time_Key time
-        Time_Format %d/%b/%Y:%H:%M:%S %z
-
-    [PARSER]
-        Name   apache_error
-        Format regex
-        Regex  ^\[[^ ]* (?<time>[^\]]*)\] \[(?<level>[^\]]*)\](?: \[pid (?<pid>[^\]]*)\])?( \[client (?<client>[^\]]*)\])? (?<message>.*)$
-
-    [PARSER]
-        Name   nginx
-        Format regex
-        Regex ^(?<remote>[^ ]*) (?<host>[^ ]*) (?<user>[^ ]*) \[(?<time>[^\]]*)\] "(?<method>\S+)(?: +(?<path>[^\"]*?)(?: +\S*)?)?" (?<code>[^ ]*) (?<size>[^ ]*)(?: "(?<referer>[^\"]*)" "(?<agent>[^\"]*)")?$
-        Time_Key time
-        Time_Format %d/%b/%Y:%H:%M:%S %z
-
     [PARSER]
         Name   json
         Format json
@@ -97,7 +68,7 @@ data:
         Format      json
         Time_Key    time
         Time_Format %Y-%m-%dT%H:%M:%S.%L
-        Time_Keep   On
+        Decode_Field_As   escaped    log
 
     [PARSER]
         Name        syslog

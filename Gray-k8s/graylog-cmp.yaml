@@ -75,7 +75,8 @@ data:
     # Create one by using for example: echo -n yourpassword | shasum -a 256
     # and put the resulting hash value into the following line
     # CHANGE THIS!
-    root_password_sha2 = 582e51308878c77f4e2c2a99adb246a792f73d1217181156d3be4bcd2493dbce
+    #graypass
+    root_password_sha2 = 20415472911841a3ae2c3376a6b612c07d917ad7dc9fc058d5a24dd2c93b999d
 
 
     # The email address of the root user.
@@ -202,7 +203,7 @@ data:
     # Default: http://127.0.0.1:9200
     #elasticsearch_hosts = http://node1:9200,http://user:password@node2:19200
     #elasticsearch_hosts = http://elastic:elasticpwd@elas:9200,http://elastic:8NKa0jNy7AGHMtRQGUYh@10.10.35.102:10094
-    elasticsearch_hosts = http://elastic:elasticpwd@elas:9200
+    elasticsearch_hosts = http://elastic:elasticpwd@elas.monitoring.svc.cluster.local:9200
     #elasticsearch_hosts = http://elastic:elasticpwd@graylog-elasticsearch:9200
 
     # Maximum amount of time to wait for successfull connection to Elasticsearch HTTP port.
@@ -754,3 +755,5 @@ data:
             </Root>
         </Loggers>
     </Configuration>
+  node-id: |-
+    122be53e-6ad4-4599-9c43-3ac2682dd3cc
