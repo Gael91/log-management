@@ -147,7 +147,7 @@ data:
     # This setting can be overriden on a per-request basis with the "X-Graylog-Server-URL" HTTP request header.
     #
     # Default: $http_publish_uri
-    http_external_uri = http://192.168.86.105:32000/
+    http_external_uri = http://192.168.86.92:32000/
 
     #### Enable CORS headers for HTTP interface
     #
@@ -594,7 +594,7 @@ data:
     transport_email_from_email = edgael53@gmail.com
     transport_email_use_tls = false
     transport_email_use_ssl = false
-    transport_email_web_interface_url = http://192.168.86.105:32000
+    transport_email_web_interface_url = http://192.168.86.92:32000
 
     # Encryption settings
     #

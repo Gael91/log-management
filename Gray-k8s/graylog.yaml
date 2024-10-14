@@ -5,6 +5,8 @@ metadata:
   namespace: monitoring
   labels:
     app: graylog
+  annotations:
+    configmap.reloader.stakater.com/reload: "graylog-config"
 spec:
   replicas: 1
   selector:
@@ -68,6 +70,7 @@ spec:
     nodePort: 32000
   - port: 12201
     name: gelf
+    nodePort: 31002
   selector:
     app: graylog
 ---
