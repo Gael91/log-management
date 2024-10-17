@@ -87,4 +87,4 @@ spec:
   resources:
     requests:
       storage: 5Gi
-  storageClassName: openebs-device
+  storageClassName: openebs-hostpath
