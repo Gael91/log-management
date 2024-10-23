@@ -20,15 +20,12 @@ spec:
       containers:
       - name: graylog
         image: graylog/graylog:6.1
-        # env:
-        # - name: "GRAYLOG_WEB_LISTEN_URI"
-        #   value: "http://0.0.0.0:9000"
-        # - name: "GRAYLOG_WEB_LISTEN_URI"
-        #   value: "http://0.0.0.0:9000/"
-        # - name: GRAYLOG_MONGO_URI
-        #   value: mongodb://mongo:27017/graylog
-        # - name: GRAYLOG_ELASTICSEARCH_HOSTS
-        #   value: http://elastic:elasticpwd@elas:9200
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            keytool -importcert -alias elasticsearch-cert -file /usr/share/graylog/data/certs/rootCA.pem -keystore /opt/java/openjdk/lib/security/cacerts -storepass changeit -noprompt && tini -- /docker-entrypoint.sh
+        securityContext:
+          runAsUser: 0  # Exécution en tant que root pour avoir accès au keystore
         ports:
         - containerPort: 9000
           name: web
@@ -39,6 +36,8 @@ spec:
           mountPath: /usr/share/graylog/data/config
         - name: journal
           mountPath: /usr/share/graylog/data/journal
+        - name: graylog-certs
+          mountPath: /usr/share/graylog/data/certs
       volumes:
       - name: graylog-config
         configMap:
@@ -46,14 +45,9 @@ spec:
       - name: journal
         persistentVolumeClaim:
           claimName: gray-claim
-
-      #   volumeMounts:
-      #   - name: graylog-certs
-      #     mountPath: /etc/graylog/certs
-      # volumes:
-      # - name: graylog-certs
-      #   secret:
-      #     secretName: elastic-certs
+      - name: graylog-certs
+        secret:
+          secretName: gray-certs
 ---
 apiVersion: v1
 kind: Service

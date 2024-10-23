@@ -38,7 +38,7 @@ data:
     [FILTER]
         Name                kubernetes
         Match               kube.*
-        Kube_URL            https://192.168.86.6:6443
+        Kube_URL            https://127.0.0.1:6443
         Kube_Tag_Prefix     kube.var.log.containers.
         Merge_Log_Key       log
         Merge_Log           On

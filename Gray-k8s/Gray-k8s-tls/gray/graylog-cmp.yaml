@@ -203,7 +203,8 @@ data:
     # Default: http://127.0.0.1:9200
     #elasticsearch_hosts = http://node1:9200,http://user:password@node2:19200
     #elasticsearch_hosts = http://elastic:elasticpwd@elas:9200,http://elastic:8NKa0jNy7AGHMtRQGUYh@10.10.35.102:10094
-    elasticsearch_hosts = http://elastic:elasticpwd@elas.monitoring.svc.cluster.local:9200
+    elasticsearch_hosts = https://elastic:elasticpwd@elas.monitoring.svc.cluster.local:9200
+    #elasticsearch.ssl.verification_mode = none
     #elasticsearch_hosts = http://elastic:elasticpwd@graylog-elasticsearch:9200
 
     # Maximum amount of time to wait for successfull connection to Elasticsearch HTTP port.

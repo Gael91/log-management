@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: monitoring
+  name: elas-config
+  labels:
+    app: elas
+data:
+  elasticsearch.yml: |-
+    discovery.type: single-node
+    cluster.name: elasticsearch
+    network.host: 0.0.0.0
+    network.publish_host: 0.0.0.0
+    http.port: 9200
+    transport.port: 9300
+    
+    xpack.security.enabled: true
+    xpack.monitoring.collection.enabled: true
+    bootstrap.memory_lock: true
+    xpack.security.transport.ssl.enabled: true
+    xpack.security.transport.ssl.supported_protocols: "TLSv1.2"
+    xpack.security.transport.ssl.client_authentication: none
+    xpack.security.transport.ssl.verification_mode: certificate
+    xpack.security.transport.ssl.key: /usr/share/elasticsearch/config/certs/es.key
+    xpack.security.transport.ssl.certificate_authorities: /usr/share/elasticsearch/config/certs/rootCA.pem
+    xpack.security.transport.ssl.certificate: /usr/share/elasticsearch/config/certs/es.crt
+    xpack.security.http.ssl.enabled: true
+    xpack.security.http.ssl.supported_protocols: "TLSv1.2"
+    xpack.security.http.ssl.client_authentication: none
+    xpack.security.http.ssl.key: /usr/share/elasticsearch/config/certs/es.key
+    xpack.security.http.ssl.certificate_authorities: /usr/share/elasticsearch/config/certs/rootCA.pem
+    xpack.security.http.ssl.certificate: /usr/share/elasticsearch/config/certs/es.crt
