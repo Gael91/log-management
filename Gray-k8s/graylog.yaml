@@ -37,15 +37,15 @@ spec:
         volumeMounts:
         - name: graylog-config
           mountPath: /usr/share/graylog/data/config
-        - name: journal
-          mountPath: /usr/share/graylog/data/journal
+        # - name: journal
+        #   mountPath: /usr/share/graylog/data/journal
       volumes:
       - name: graylog-config
         configMap:
           name: graylog-config
-      - name: journal
-        persistentVolumeClaim:
-          claimName: gray-claim
+      # - name: journal
+      #   persistentVolumeClaim:
+      #     claimName: gray-claim
 
       #   volumeMounts:
       #   - name: graylog-certs
@@ -73,18 +73,18 @@ spec:
     nodePort: 31002
   selector:
     app: graylog
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: gray-claim
-  namespace: monitoring
-  labels:
-    app: graylog
-spec:
-  accessModes:
-  - ReadWriteOnce
-  resources:
-    requests:
-      storage: 5Gi
-  #storageClassName: openebs-hostpath
+# ---
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: gray-claim
+#   namespace: monitoring
+#   labels:
+#     app: graylog
+# spec:
+#   accessModes:
+#   - ReadWriteOnce
+#   resources:
+#     requests:
+#       storage: 20Gi
+#   storageClassName: openebs-hostpath

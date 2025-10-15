@@ -147,7 +147,7 @@ data:
     # This setting can be overriden on a per-request basis with the "X-Graylog-Server-URL" HTTP request header.
     #
     # Default: $http_publish_uri
-    http_external_uri = http://192.168.86.5:32000/
+    http_external_uri = http://192.168.86.6:32000/
 
     #### Enable CORS headers for HTTP interface
     #
@@ -483,7 +483,7 @@ data:
     # For optimum performance your LogMessage objects in the ring buffer should fit in your CPU L3 cache.
     # Must be a power of 2. (512, 1024, 2048, ...)
     ring_size = 65536
-
+    elasticsearch_mute_deprecation_warnings = true
     inputbuffer_ring_size = 65536
     inputbuffer_processors = 2
     inputbuffer_wait_strategy = blocking
@@ -504,7 +504,7 @@ data:
     # For a maximum of 12 hours or 5 GB whichever happens first.
     # During normal operation the journal will be smaller.
     #message_journal_max_age = 12h
-    #message_journal_max_size = 5gb
+    message_journal_max_size = 2200MB
 
     #message_journal_flush_age = 1m
     #message_journal_flush_interval = 1000000
@@ -557,7 +557,8 @@ data:
 
     # Use a replica set instead of a single host
     #mongodb_uri = mongodb://grayloguser:secret@localhost:27017,localhost:27018,localhost:27019/graylog?replicaSet=rs01
-    mongodb_uri = mongodb://mongo:27017/graylog
+    #mongodb_uri = mongodb://root:ZmZjMGQ2Y2NkMWYzOTU1OTNkZjJhYz@mongodb-headless.monitoring.svc.cluster.local:27017/graylog?authSource=admin
+    mongodb_uri = mongodb://root:ZmZjMGQ2Y2NkMWYzOTU1OTNkZjJhYz@mongodb-0.mongodb-headless.monitoring.svc.cluster.local:27017,mongodb-1.mongodb-headless.monitoring.svc.cluster.local:27017,mongodb-2.mongodb-headless.monitoring.svc.cluster.local:27017/graylog?authSource=admin
     #mongodb_uri = mongodb://graylog:KgDH0WD5x8UnIfFdU1fO@graylog-mongo:27017/graylog
 
     # DNS Seedlist https://docs.mongodb.com/manual/reference/connection-string/#dns-seedlist-connection-format
@@ -594,7 +595,7 @@ data:
     transport_email_from_email = edgael53@gmail.com
     transport_email_use_tls = false
     transport_email_use_ssl = false
-    transport_email_web_interface_url = http://192.168.86.5:32000
+    transport_email_web_interface_url = http://192.168.86.6:32000
 
     # Encryption settings
     #
