@@ -6,8 +6,6 @@ metadata:
   labels:
     k8s-app: fluent-bit
 data:
-  # Configuration files: server, input, filters and output
-  # ======================================================
   fluent-bit.conf: |
     [SERVICE]
         Flush         1
@@ -28,7 +26,6 @@ data:
         Tag               kube.*
         Path              /var/log/containers/*.log
         Parser            docker
-        multiline.parser  docker
         DB                /var/log/flb_kube.db
         Mem_Buf_Limit     50MB
         Skip_Long_Lines   Off
@@ -38,21 +35,111 @@ data:
     [FILTER]
         Name                kubernetes
         Match               kube.*
-        Kube_URL            https://127.0.0.1:6443
+        Kube_URL            https://kubernetes.default.svc:443
         Kube_Tag_Prefix     kube.var.log.containers.
-        Merge_Log_Key       log
         Merge_Log           On
-        Keep_Log            Off
-        Labels              Off
-        Annotations         Off
+        Keep_Log            On
         K8S-Logging.Parser  On
-        tls.verify          Off
-        Buffer_Size         0
+        K8S-Logging.Exclude On
+        Labels              On
+        Annotations         Off
+
+    # Parser JSON pour toutes les applications
+    [FILTER]
+        Name                parser
+        Match               kube.*
+        Key_Name            log
+        Parser              json-log
+        Reserve_Data        On
+        Preserve_Key        On
+
+    # Convertir les niveaux de log texte en numériques pour GELF
+    [FILTER]
+        Name                modify
+        Match               kube.*
+        Condition           Key_Value_Equals level debug
+        Set                 level 7
+
+    [FILTER]
+        Name                modify
+        Match               kube.*
+        Condition           Key_Value_Equals level info
+        Set                 level 6
+
+    [FILTER]
+        Name                modify
+        Match               kube.*
+        Condition           Key_Value_Equals level notice
+        Set                 level 5
+
+    [FILTER]
+        Name                modify
+        Match               kube.*
+        Condition           Key_Value_Equals level warning
+        Set                 level 4
+
+    [FILTER]
+        Name                modify
+        Match               kube.*
+        Condition           Key_Value_Equals level warn
+        Set                 level 4
+
+    [FILTER]
+        Name                modify
+        Match               kube.*
+        Condition           Key_Value_Equals level error
+        Set                 level 3
+
+    [FILTER]
+        Name                modify
+        Match               kube.*
+        Condition           Key_Value_Equals level critical
+        Set                 level 2
+
+    [FILTER]
+        Name                modify
+        Match               kube.*
+        Condition           Key_Value_Equals level alert
+        Set                 level 1
+
+    [FILTER]
+        Name                modify
+        Match               kube.*
+        Condition           Key_Value_Equals level emergency
+        Set                 level 0
+
+    # Créer un champ short_message pour GELF
+    # Priorité : message > msg > log
+    [FILTER]
+        Name                modify
+        Match               kube.*
+        Condition           Key_Exists message
+        Copy                message short_message
+
+    [FILTER]
+        Name                modify
+        Match               kube.*
+        Condition           Key_Exists msg
+        Condition           Key_Does_Not_Exist short_message
+        Copy                msg short_message
+
+    [FILTER]
+        Name                modify
+        Match               kube.*
+        Condition           Key_Does_Not_Exist short_message
+        Copy                log short_message
+
+    # Renommage des champs MongoDB
+    [FILTER]
+        Name                modify
+        Match               kube.*
+        Condition           Key_Exists s
+        Rename              s severity
+        Rename              c component
 
     [FILTER]
         Name                nest
         Match               *
-        Wildcard            container_name
         Operation           lift
         Nested_under        kubernetes
         Add_prefix          kubernetes_
@@ -67,11 +154,12 @@ data:
     [OUTPUT]
         Name                   gelf
         Match                  *
-        Host                   graylog
+        Host                   192.168.86.5
         Port                   12201
         Mode                   tcp
-        Gelf_Short_Message_Key log
+        Gelf_Short_Message_Key short_message
         Host_Key               host
+        Level_Key              level
 
   parsers.conf: |
     [PARSER]
@@ -80,3 +168,8 @@ data:
         Time_Key    time
         Time_Format %Y-%m-%dT%H:%M:%S.%L
         Time_Keep   Off
+
+    [PARSER]
+        Name        json-log
+        Format      json
+        Time_Keep   On

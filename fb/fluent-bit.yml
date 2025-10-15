@@ -30,11 +30,11 @@ spec:
         imagePullPolicy: Always
         env:
             - name: FLUENT_ELASTICSEARCH_HOST
-              value: "elas"
+              value: "192.168.86.5"
             - name: FLUENT_ELASTICSEARCH_PORT
               value: "9200"
             - name: FLUENT_GRAYLOG_HOST
-              value: "graylog"
+              value: "192.168.86.5"
             - name: FLUENT_GRAYLOG_PORT
               value: "12201"
         ports:
